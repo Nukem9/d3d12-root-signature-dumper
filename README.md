@@ -4,7 +4,7 @@ Simple utility to convert binary D3D12 root signatures (v1.1 RSGs) to text.
 
 ## Building
 
-- CMake and vcpkg are expected to be set up beforehand. Visual Studio 2022 is recommended.
+- CMake is expected to be set up beforehand. Visual Studio 2022 is recommended.
 
 ```
 git clone --recurse-submodules https://github.com/Nukem9/d3d12-root-signature-dumper.git
