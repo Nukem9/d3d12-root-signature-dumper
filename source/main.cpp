@@ -4,12 +4,20 @@
 
 int main(int argc, char **argv)
 {
-	if (argc != 2)
+	if (argc < 2)
 	{
-		printf("Usage: RootSigDumper.exe <root_signature.bin>\n");
+		printf("Usage: RootSigDumper.exe <root_signature.bin> [--quoted-string]\n");
 		printf("(Input binaries are created with \"dxc.exe -dumpbin <shader.bin> -Qstrip_rootsignature -Fo <root_signature.bin>\")\n");
 		printf("\n");
 		return 1;
+	}
+
+	bool asQuotedString = false;
+
+	for (int i = 2; i < argc; i++)
+	{
+		if (!_stricmp(argv[i], "--quoted-string"))
+			asQuotedString = true;
 	}
 
 	if (std::ifstream f(argv[1], std::ios::binary | std::ios::ate); f.good())
@@ -34,7 +42,7 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		const auto asText = D3DRootSignature::RootSignatureToString(desc->Desc_1_1);
+		const auto asText = D3DRootSignature::RootSignatureToString(desc->Desc_1_1, asQuotedString);
 		printf("%s\n", asText.c_str());
 
 		return 0;

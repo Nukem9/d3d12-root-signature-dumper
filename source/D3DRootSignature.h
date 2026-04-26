@@ -20,5 +20,5 @@ namespace D3DRootSignature
 		D3D12_SHADER_VISIBILITY Visibility);
 	std::string RootDescriptorTableToString(const D3D12_ROOT_DESCRIPTOR_TABLE1& Table, D3D12_SHADER_VISIBILITY Visibility);
 	std::string StaticSamplerToString(const D3D12_STATIC_SAMPLER_DESC& Sampler);
-	std::string RootSignatureToString(const D3D12_ROOT_SIGNATURE_DESC1& RootSig);
+	std::string RootSignatureToString(const D3D12_ROOT_SIGNATURE_DESC1& RootSig, bool SourceHeaderFriendly);
 }

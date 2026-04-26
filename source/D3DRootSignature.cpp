@@ -453,7 +453,7 @@ namespace D3DRootSignature
 		return s;
 	}
 
-	std::string RootSignatureToString(const D3D12_ROOT_SIGNATURE_DESC1& RootSig)
+	std::string RootSignatureToString(const D3D12_ROOT_SIGNATURE_DESC1& RootSig, bool SourceHeaderFriendly)
 	{
 		std::string sig = RootFlagsToString(RootSig.Flags) + ",\n";
 
@@ -483,19 +483,59 @@ namespace D3DRootSignature
 				break;
 			}
 
-			sig += std::format(", /* Index = {} */\n", i);
+			if (SourceHeaderFriendly)
+				sig += std::format(",\n\n");
+			else
+				sig += std::format(", /* Index = {} */\n", i);
 		}
 
 		// Then embedded samplers
 		for (uint32_t i = 0; i < RootSig.NumStaticSamplers; i++)
 		{
 			const auto& sampler = RootSig.pStaticSamplers[i];
-			sig += std::format("{}, /* Index = {} */\n", StaticSamplerToString(sampler), i);
+
+			if (SourceHeaderFriendly)
+				sig += std::format("{},\n", StaticSamplerToString(sampler), i);
+			else
+				sig += std::format("{}, /* Index = {} */\n", StaticSamplerToString(sampler), i);
 		}
 
-		// Trim the final comma
+		
+		// Trim trailing comma
 		if (const auto index = sig.find_last_of(','); index != std::string::npos)
 			sig = sig.erase(index, 1);
+
+		// Wrap each line in quotes if header-friendly output is requested
+		if (SourceHeaderFriendly)
+		{
+			std::string wrapped;
+			size_t start = 0;
+			size_t end = 0;
+
+			while ((end = sig.find('\n', start)) != std::string::npos)
+			{
+				if (!wrapped.empty()) wrapped += '\n';
+				if (sig.substr(start, end - start).length() > 0)
+					wrapped += std::format("\"{}\" \\", sig.substr(start, end - start));
+				else
+					wrapped += "\\";
+				start = end + 1;
+			}
+
+			if (start < sig.length())
+			{
+				if (!wrapped.empty()) wrapped += '\n';
+				if (sig.substr(start).length() > 0)
+					wrapped += std::format("\"{}\" \\", sig.substr(start));
+				else
+					wrapped += "\\";
+			}
+
+			if (const auto index = wrapped.find_last_of(" \\"); index != std::string::npos)
+				wrapped = wrapped.erase(index - 1, 2);
+
+			sig = wrapped;
+		}
 
 		return sig;
 	}
